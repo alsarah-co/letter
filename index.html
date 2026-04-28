@@ -1,351 +1,255 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>A Letter For You 💌</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Sacramento&family=Jost:wght@300;400&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Sacramento&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --cream: #fdf8f0;
-      --rose: #b83a52;
-      --rose-light: #d4637a;
-      --rose-pale: #f9eaee;
-      --blush: #f2d4d9;
-      --gold: #c4935a;
-      --gold-light: #ddb880;
-      --ink: #2e1a1a;
-      --shadow: rgba(80, 20, 35, 0.15);
+      --pink:       #f4a7b5;
+      --pink-dark:  #e8889a;
+      --pink-light: #f9cdd6;
+      --pink-mid:   #f0b8c4;
+      --outline:    #b5606e;
+      --red:        #d63a4a;
+      --red-dark:   #b02535;
+      --ink:        #2a1520;
+      --rose:       #c0415a;
     }
 
     body {
       min-height: 100vh;
-      background: #fdf0f3;
-      background-image:
-        radial-gradient(ellipse at 15% 15%, #fce0e6 0%, transparent 50%),
-        radial-gradient(ellipse at 85% 85%, #f5e5d8 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, #fff5f7 0%, transparent 70%);
+      background: linear-gradient(145deg, #fff0f3 0%, #fff8f5 50%, #fdf0f8 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       font-family: 'Jost', sans-serif;
-      gap: 36px;
-      padding: 50px 20px;
+      padding: 60px 20px;
+      gap: 28px;
+      overflow-x: hidden;
     }
 
-    .bg-petals { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
-    .petal {
-      position: absolute;
-      opacity: 0.06;
-      animation: floatPetal linear infinite;
-      font-size: 1.2rem;
-      color: var(--rose);
-    }
-    @keyframes floatPetal {
-      0%   { transform: translateY(110vh) rotate(0deg); opacity: 0.06; }
-      100% { transform: translateY(-10vh) rotate(40deg); opacity: 0; }
+    /* ── bg drifting hearts ── */
+    .bg-layer { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .bg-h { position: absolute; color: #e07a90; opacity: 0.06; animation: bgRise linear infinite; }
+    @keyframes bgRise {
+      from { transform: translateY(110vh); opacity: 0.06; }
+      to   { transform: translateY(-12vh); opacity: 0; }
     }
 
-    .scene {
+    /* ══════════════════
+       ENVELOPE STAGE
+    ══════════════════ */
+    .stage {
       position: relative;
       z-index: 1;
-      width: min(420px, 92vw);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      width: min(340px, 88vw);
+      cursor: pointer;
     }
 
-    .envelope-wrap {
-      position: relative;
+    /* ── SVG envelope drawn via CSS shapes ── */
+    .envelope-svg {
       width: 100%;
-      perspective: 1000px;
+      display: block;
+      filter: drop-shadow(0 10px 30px rgba(180,50,80,0.18));
+      transition: filter 0.3s;
     }
+    .stage:hover .envelope-svg { filter: drop-shadow(0 14px 38px rgba(180,50,80,0.28)); }
 
-    .env-shadow {
+    /* heart seal on top of SVG */
+    .heart-seal {
       position: absolute;
-      bottom: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80%;
-      height: 28px;
-      background: radial-gradient(ellipse, var(--shadow) 0%, transparent 75%);
-      transition: opacity 0.8s;
-    }
-
-    .envelope {
-      position: relative;
-      width: 100%;
-      padding-top: 62%;
-      background: linear-gradient(170deg, #f5d8c0 0%, #f9e8d8 50%, var(--cream) 100%);
-      border-radius: 5px 5px 12px 12px;
-      box-shadow:
-        0 12px 45px var(--shadow),
-        0 2px 8px rgba(0,0,0,0.06),
-        inset 0 1px 0 rgba(255,255,255,0.6);
-    }
-
-    .env-fold-left {
-      position: absolute; bottom: 0; left: 0; width: 0; height: 0;
-      border-style: solid;
-      border-width: 0 0 180px 210px;
-      border-color: transparent transparent #e8c0a0 transparent;
-      opacity: 0.5;
-    }
-    .env-fold-right {
-      position: absolute; bottom: 0; right: 0; width: 0; height: 0;
-      border-style: solid;
-      border-width: 0 210px 180px 0;
-      border-color: transparent transparent #ddb090 transparent;
-      opacity: 0.5;
-    }
-
-    .env-flap {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      transform-origin: top center;
-      transform-style: preserve-3d;
-      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      /* center of envelope — roughly 50% left, 50% top of the SVG */
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 18%;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      pointer-events: none;
       z-index: 10;
     }
-    .flap-front {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      padding-top: 54%;
-      background: linear-gradient(140deg, #ddb880 0%, #c9975e 100%);
-      clip-path: polygon(0 0, 100% 0, 50% 100%);
-      backface-visibility: hidden;
-      border-radius: 5px 5px 0 0;
-    }
-    .flap-back {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      padding-top: 54%;
-      background: linear-gradient(140deg, #fdf5ec 0%, #f5e8d8 100%);
-      clip-path: polygon(0 0, 100% 0, 50% 100%);
-      backface-visibility: hidden;
-      transform: rotateX(180deg);
-      border-radius: 5px 5px 0 0;
-    }
-    .envelope.open .env-flap { transform: rotateX(-180deg); }
-
-    .seal {
-      position: absolute;
-      top: 38%; left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 20;
-      width: 56px; height: 56px;
-      background: radial-gradient(circle at 35% 32%, #e07090, var(--rose) 65%);
-      border-radius: 50%;
-      box-shadow: 0 3px 14px rgba(160,40,60,0.4), inset 0 1px 3px rgba(255,255,255,0.25);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.7rem;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      user-select: none;
-    }
-    .seal:hover { transform: translate(-50%,-50%) scale(1.08); box-shadow: 0 6px 20px rgba(160,40,60,0.5); }
-    .seal.broken { animation: sealPop 0.45s ease forwards; }
-    @keyframes sealPop {
-      0%   { transform: translate(-50%,-50%) scale(1); opacity: 1; }
-      55%  { transform: translate(-50%,-50%) scale(1.3); opacity: 0.5; }
-      100% { transform: translate(-50%,-50%) scale(0); opacity: 0; pointer-events: none; }
-    }
-
-    .stamp {
-      position: absolute;
-      top: 14px; right: 16px;
-      width: 54px; height: 64px;
-      background: var(--cream);
-      border: 2px solid var(--gold);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 2px;
-      box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
-      mask-image:
-        radial-gradient(circle at 0 50%, transparent 5px, black 5px),
-        radial-gradient(circle at 100% 50%, transparent 5px, black 5px),
-        radial-gradient(circle at 50% 0, transparent 5px, black 5px),
-        radial-gradient(circle at 50% 100%, transparent 5px, black 5px);
-      mask-composite: intersect;
-      -webkit-mask-image:
-        radial-gradient(circle at 0 50%, transparent 5px, black 5px),
-        radial-gradient(circle at 100% 50%, transparent 5px, black 5px),
-        radial-gradient(circle at 50% 0, transparent 5px, black 5px),
-        radial-gradient(circle at 50% 100%, transparent 5px, black 5px);
-      -webkit-mask-composite: destination-in;
-    }
-    .stamp-heart { font-size: 1.5rem; line-height: 1; }
-    .stamp-text { font-size: 0.38rem; color: var(--gold); letter-spacing: 0.1em; font-weight: 600; text-transform: uppercase; }
-
-    .address {
-      position: absolute;
-      bottom: 20%;
-      left: 12%;
-      display: flex; flex-direction: column; gap: 5px;
-      opacity: 0.2;
-    }
-    .addr-line { height: 2px; background: var(--ink); border-radius: 2px; }
-
-    .letter-wrap {
-      position: absolute;
-      bottom: 8px;
-      left: 50%;
-      transform: translateX(-50%) translateY(0);
-      width: 86%;
-      z-index: 5;
-      transition: transform 0.85s cubic-bezier(0.34, 1.35, 0.64, 1) 0.45s;
-    }
-    .envelope.open .letter-wrap {
-      transform: translateX(-50%) translateY(-240px);
-    }
-
-    .letter {
-      background: var(--cream);
-      background-image: repeating-linear-gradient(
-        transparent, transparent 29px, rgba(180,120,100,0.13) 30px
-      );
-      border-radius: 3px;
-      box-shadow: 0 6px 24px rgba(80,20,35,0.12), 0 1px 4px rgba(0,0,0,0.06);
-      padding: 22px 20px 18px;
-      min-height: 220px;
-      position: relative;
+    .stage.open .heart-seal {
       opacity: 0;
-      transition: opacity 0.6s ease 1s;
-      border-top: 3px solid var(--gold-light);
+      transform: translate(-50%, -60%) scale(0.6);
     }
-    .envelope.open .letter { opacity: 1; }
 
-    .letter-greeting {
-      font-family: 'Sacramento', cursive;
-      color: var(--rose);
-      font-size: 1.5rem;
-      margin-bottom: 10px;
+    /* hint */
+    .hint {
       text-align: center;
+      font-size: 0.75rem;
+      color: var(--rose);
+      opacity: 0.55;
+      letter-spacing: 0.12em;
+      margin-top: 10px;
+      font-weight: 300;
+      transition: opacity 0.4s;
     }
+    .hint.hidden { opacity: 0; pointer-events: none; }
+
+    /* ══════════════════
+       LETTER CARD
+    ══════════════════ */
+    .letter-card {
+      position: relative;
+      z-index: 1;
+      width: min(340px, 88vw);
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 8px 40px rgba(180,50,80,0.11), 0 1px 6px rgba(0,0,0,0.06);
+      padding: 30px 24px 26px;
+      opacity: 0;
+      transform: translateY(40px);
+      max-height: 0;
+      overflow: hidden;
+      pointer-events: none;
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .letter-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+      max-height: 9999px;
+      overflow: visible;
+      pointer-events: auto;
+    }
+
+    .letter-top { text-align: center; margin-bottom: 16px; }
+    .letter-top-icon { font-size: 1.4rem; display: block; margin-bottom: 4px; }
+    .letter-greeting { font-family: 'Sacramento', cursive; color: var(--rose); font-size: 2rem; }
+
+    .divider {
+      display: flex; align-items: center; gap: 10px;
+      margin: 12px 0; color: #e8c0c8; font-size: 0.9rem;
+    }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #f0dde0; }
 
     .letter-body {
       font-family: 'Cormorant Garamond', serif;
-      color: var(--ink);
-      font-size: 1.07rem;
-      line-height: 2.1;
-      text-align: left;
-      white-space: pre-wrap;
+      font-size: 1.1rem; line-height: 2;
+      color: var(--ink); white-space: pre-wrap;
     }
-
     .letter-sign {
-      margin-top: 16px;
+      margin-top: 20px; text-align: right;
       font-family: 'Sacramento', cursive;
-      color: var(--rose);
-      font-size: 1.3rem;
-      text-align: right;
+      font-size: 1.5rem; color: var(--rose);
     }
 
-    .btn-row {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      gap: 14px;
-    }
-
-    .btn {
-      padding: 13px 36px;
-      border: none;
+    /* ══════════════════
+       RESET BUTTON
+    ══════════════════ */
+    .btn-reset {
+      position: relative; z-index: 2;
+      padding: 11px 34px;
+      background: #fff; color: var(--rose);
+      border: 1.5px solid #f0d0d8;
       border-radius: 50px;
       font-family: 'Jost', sans-serif;
-      font-size: 1rem;
-      font-weight: 400;
+      font-size: 0.9rem; letter-spacing: 0.08em;
       cursor: pointer;
-      letter-spacing: 0.06em;
-      transition: transform 0.2s, box-shadow 0.2s, opacity 0.4s;
-    }
-    .btn:hover { transform: translateY(-2px); }
-    .btn:active { transform: translateY(0); }
-
-    .btn-open {
-      background: linear-gradient(135deg, var(--rose-light), var(--rose));
-      color: #fff;
-      box-shadow: 0 6px 22px rgba(180,50,80,0.3);
-    }
-    .btn-open:hover { box-shadow: 0 10px 28px rgba(180,50,80,0.42); }
-    .btn-open.hidden { opacity: 0; pointer-events: none; }
-
-    .btn-reset {
-      background: var(--cream);
-      color: var(--rose);
-      border: 1.5px solid var(--blush);
       box-shadow: 0 4px 14px rgba(180,50,80,0.1);
+      opacity: 0; pointer-events: none;
+      transition: transform 0.2s, box-shadow 0.2s, opacity 0.5s;
     }
-    .btn-reset:hover { box-shadow: 0 8px 20px rgba(180,50,80,0.18); }
+    .btn-reset.visible { opacity: 1; pointer-events: auto; }
+    .btn-reset:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(180,50,80,0.18); }
 
+    /* ══════════════════
+       BURST HEARTS
+    ══════════════════ */
     .burst {
-      position: fixed;
-      pointer-events: none;
-      z-index: 999;
-      animation: burstFly 1.5s ease-out forwards;
-      font-size: 1.3rem;
+      position: fixed; pointer-events: none; z-index: 999;
+      animation: burstUp var(--dur, 1.4s) ease-out forwards;
     }
-    @keyframes burstFly {
-      0%   { opacity: 1; transform: translate(0,0) scale(1) rotate(0deg); }
-      100% { opacity: 0; transform: translate(var(--dx),var(--dy)) scale(0.2) rotate(var(--dr)); }
+    @keyframes burstUp {
+      0%   { opacity: 1; transform: translate(0,0) scale(1); }
+      100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.1) rotate(var(--dr)); }
     }
   </style>
 </head>
 <body>
 
-  <div class="bg-petals" id="bgPetals"></div>
+  <div class="bg-layer" id="bgLayer"></div>
 
-  <div class="scene">
-    <div class="envelope-wrap">
-      <div class="env-shadow" id="envShadow"></div>
+  <div class="stage" id="stage" onclick="openEnvelope()">
 
-      <div class="envelope" id="envelope">
-        <div class="env-fold-left"></div>
-        <div class="env-fold-right"></div>
+    <!-- Envelope drawn as SVG (pink cartoon style) -->
+    <svg class="envelope-svg" viewBox="0 0 400 270" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- open flap clip: shows only bottom part when flap is open -->
+        <clipPath id="bodyClip">
+          <rect x="0" y="0" width="400" height="270"/>
+        </clipPath>
+      </defs>
 
-        <div class="stamp">
-          <div class="stamp-heart">❤️</div>
-          <div class="stamp-text">Heart Stamp</div>
-        </div>
+      <!-- envelope body -->
+      <rect x="8" y="8" width="384" height="254" rx="18" ry="18"
+            fill="#f4a7b5" stroke="#b5606e" stroke-width="5"/>
 
-        <div class="address">
-          <div class="addr-line" style="width:75px"></div>
-          <div class="addr-line" style="width:55px"></div>
-          <div class="addr-line" style="width:65px"></div>
-        </div>
+      <!-- left triangle fold -->
+      <polygon points="8,8 8,262 210,148"
+               fill="#f0b0be" stroke="#b5606e" stroke-width="3" stroke-linejoin="round"/>
 
-        <div class="letter-wrap">
-          <div class="letter">
-            <div class="letter-greeting">For You 🤍</div>
-            <div class="letter-body" id="letterBody"></div>
-            <div class="letter-sign">With all my love ❤️</div>
-          </div>
-        </div>
+      <!-- right triangle fold -->
+      <polygon points="392,8 392,262 190,148"
+               fill="#ebb8c4" stroke="#b5606e" stroke-width="3" stroke-linejoin="round"/>
 
-        <div class="env-flap" id="envFlap">
-          <div class="flap-front"></div>
-          <div class="flap-back"></div>
-        </div>
+      <!-- bottom triangle fold -->
+      <polygon points="8,262 392,262 200,140"
+               fill="#f4a7b5" stroke="#b5606e" stroke-width="3" stroke-linejoin="round"/>
 
-        <div class="seal" id="seal">❤️</div>
-      </div>
+      <!-- top flap (closed state) — rotates away when open -->
+      <g id="flapGroup" style="transform-origin:200px 8px; transform-box:fill-box;">
+        <polygon id="flapPoly" points="8,8 392,8 200,148"
+                 fill="#f9cdd6" stroke="#b5606e" stroke-width="3.5" stroke-linejoin="round"/>
+        <!-- subtle gloss on flap -->
+        <polygon points="60,10 180,10 130,80"
+                 fill="white" opacity="0.18"/>
+      </g>
+
+      <!-- envelope outline on top -->
+      <rect x="8" y="8" width="384" height="254" rx="18" ry="18"
+            fill="none" stroke="#b5606e" stroke-width="5"/>
+
+      <!-- gloss highlight top-left -->
+      <path d="M30,20 Q80,14 130,22" stroke="white" stroke-width="5"
+            stroke-linecap="round" fill="none" opacity="0.45"/>
+      <!-- gloss right side -->
+      <path d="M375,60 Q382,120 376,180" stroke="white" stroke-width="4"
+            stroke-linecap="round" fill="none" opacity="0.3"/>
+    </svg>
+
+    <!-- Heart seal SVG — centered over the envelope -->
+    <svg class="heart-seal" id="heartSeal" viewBox="0 0 100 90" xmlns="http://www.w3.org/2000/svg">
+      <path d="M50,80 C50,80 5,50 5,25 C5,12 15,5 28,8 C36,10 44,17 50,25 C56,17 64,10 72,8 C85,5 95,12 95,25 C95,50 50,80 50,80 Z"
+            fill="#d63a4a" stroke="#8b1a2a" stroke-width="3"/>
+      <!-- gloss -->
+      <ellipse cx="36" cy="24" rx="10" ry="6" fill="white" opacity="0.35" transform="rotate(-20 36 24)"/>
+      <ellipse cx="44" cy="19" rx="4" ry="3" fill="white" opacity="0.5" transform="rotate(-20 44 19)"/>
+    </svg>
+
+    <p class="hint" id="hint">tap to open 💌</p>
+  </div>
+
+  <!-- LETTER -->
+  <div class="letter-card" id="letterCard">
+    <div class="letter-top">
+      <span class="letter-top-icon">🤍</span>
+      <div class="letter-greeting">For You</div>
     </div>
+    <div class="divider">❤</div>
+    <div class="letter-body" id="letterBody"></div>
+    <div class="letter-sign">With all my love ❤️</div>
   </div>
 
-  <div class="btn-row">
-    <button class="btn btn-open" id="openBtn">Open 💌</button>
-    <button class="btn btn-reset" id="resetBtn">Reset ↩</button>
-  </div>
+  <button class="btn-reset" id="resetBtn" onclick="resetAll()">Reset ↩</button>
 
   <script>
-    const MESSAGE =
-`I know you're not really into paper notes, so I made this for you instead 🤍
-Dear Baby,
+    document.getElementById('letterBody').textContent =
+`Dear Baby,
+I know you're not really into paper notes, so I made this for you instead 🤍
+
 I'm so, so proud of you. You work incredibly hard every single day, and I admire your dedication more than words can say. You're truly the best, and I see how much effort and heart you put into everything you do.
 
 I appreciate you so much, and I know that one day you're going to become something really great and achieve everything you dream of — you deserve it all.
@@ -354,73 +258,100 @@ I love you
 
 I got you these comfy shoes because I know how much you're on your feet all day, always giving your best and taking care of others. I hope they make your days a little easier.
 
-I hope you like them.
-From your baby`;
+I hope you like them,
+From Baby.`;
 
-    document.getElementById('letterBody').textContent = MESSAGE;
-
-    // floating bg petals
-    const bgEl = document.getElementById('bgPetals');
-    for (let i = 0; i < 20; i++) {
-      const p = document.createElement('span');
-      p.className = 'petal';
-      p.textContent = ['❤', '♡', '✿', '❀'][Math.floor(Math.random()*4)];
-      p.style.left = Math.random() * 100 + 'vw';
-      p.style.animationDuration = (9 + Math.random() * 14) + 's';
-      p.style.animationDelay = (-Math.random() * 14) + 's';
-      p.style.fontSize = (0.8 + Math.random() * 1.8) + 'rem';
-      bgEl.appendChild(p);
+    /* bg hearts */
+    const bgLayer = document.getElementById('bgLayer');
+    for (let i = 0; i < 18; i++) {
+      const h = document.createElement('span');
+      h.className = 'bg-h';
+      h.textContent = ['❤','♡','💕'][i % 3];
+      h.style.left = Math.random() * 100 + 'vw';
+      h.style.fontSize = (0.7 + Math.random() * 1.8) + 'rem';
+      h.style.animationDuration = (11 + Math.random() * 13) + 's';
+      h.style.animationDelay = (-Math.random() * 13) + 's';
+      bgLayer.appendChild(h);
     }
 
-    const envelope = document.getElementById('envelope');
-    const seal     = document.getElementById('seal');
-    const openBtn  = document.getElementById('openBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    let isOpen = false;
+    const stage      = document.getElementById('stage');
+    const flapGroup  = document.getElementById('flapGroup');
+    const hint       = document.getElementById('hint');
+    const letterCard = document.getElementById('letterCard');
+    const resetBtn   = document.getElementById('resetBtn');
+    let opened = false;
 
+    /* animate flap via CSS transition on SVG group */
+    function animateFlap() {
+      flapGroup.style.transition = 'transform 0.75s cubic-bezier(0.4,0,0.2,1)';
+      flapGroup.style.transformOrigin = '200px 8px';
+      flapGroup.style.transform = 'rotateX(180deg)';
+    }
+    function resetFlap() {
+      flapGroup.style.transition = 'transform 0.55s cubic-bezier(0.4,0,0.2,1)';
+      flapGroup.style.transform = 'rotateX(0deg)';
+    }
+
+    /* spawn hearts flying up */
     function spawnHearts() {
-      const emojis = ['❤️','💕','💖','💗','💓','🤍'];
-      for (let i = 0; i < 18; i++) {
+      const emojis = ['❤️','💕','💖','💗','🤍','💓'];
+      const rect = stage.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height * 0.4;
+
+      for (let i = 0; i < 24; i++) {
         const b = document.createElement('span');
         b.className = 'burst';
         b.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-        const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
-        b.style.left = cx + 'px';
+        b.style.left = (cx + (Math.random() - 0.5) * rect.width * 0.7) + 'px';
         b.style.top  = cy + 'px';
-        const angle = Math.random() * Math.PI * 2;
-        const dist  = 90 + Math.random() * 200;
-        b.style.setProperty('--dx', Math.cos(angle)*dist + 'px');
-        b.style.setProperty('--dy', Math.sin(angle)*dist + 'px');
-        b.style.setProperty('--dr', (Math.random()*80-40) + 'deg');
-        b.style.animationDelay = (Math.random() * 0.35) + 's';
+        b.style.fontSize = (0.9 + Math.random() * 1.3) + 'rem';
+        const spread = (Math.random() - 0.5) * 180;
+        const rise   = -(90 + Math.random() * 280);
+        b.style.setProperty('--dx', spread + 'px');
+        b.style.setProperty('--dy', rise + 'px');
+        b.style.setProperty('--dr', (Math.random() * 60 - 30) + 'deg');
+        b.style.setProperty('--dur', (1.2 + Math.random() * 0.7) + 's');
+        b.style.animationDelay = (Math.random() * 0.4) + 's';
         document.body.appendChild(b);
-        setTimeout(() => b.remove(), 2000);
+        setTimeout(() => b.remove(), 2500);
       }
     }
 
     function openEnvelope() {
-      if (isOpen) return;
-      isOpen = true;
+      if (opened) return;
+      opened = true;
+
+      hint.classList.add('hidden');
+      stage.style.cursor = 'default';
+
+      // hearts fly
       spawnHearts();
-      seal.classList.add('broken');
+
+      // heart seal fades (via .open class)
+      stage.classList.add('open');
+
+      // flap opens upward
+      animateFlap();
+
+      // show letter after flap
       setTimeout(() => {
-        envelope.classList.add('open');
-        document.getElementById('envShadow').style.opacity = '0.3';
-      }, 380);
-      openBtn.classList.add('hidden');
+        letterCard.classList.add('visible');
+        resetBtn.classList.add('visible');
+        setTimeout(() => letterCard.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+      }, 800);
     }
 
-    function resetEnvelope() {
-      isOpen = false;
-      envelope.classList.remove('open');
-      document.getElementById('envShadow').style.opacity = '1';
-      seal.classList.remove('broken');
-      openBtn.classList.remove('hidden');
+    function resetAll() {
+      opened = false;
+      stage.classList.remove('open');
+      stage.style.cursor = 'pointer';
+      hint.classList.remove('hidden');
+      resetFlap();
+      letterCard.classList.remove('visible');
+      resetBtn.classList.remove('visible');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
-    openBtn.addEventListener('click', openEnvelope);
-    seal.addEventListener('click', openEnvelope);
-    resetBtn.addEventListener('click', resetEnvelope);
   </script>
 </body>
 </html>
