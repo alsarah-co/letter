@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>A Letter For You 💌</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Sacramento&family=Jost:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #fdf8f0;
+      --rose: #b83a52;
+      --rose-light: #d4637a;
+      --rose-pale: #f9eaee;
+      --blush: #f2d4d9;
+      --gold: #c4935a;
+      --gold-light: #ddb880;
+      --ink: #2e1a1a;
+      --shadow: rgba(80, 20, 35, 0.15);
+    }
+
+    body {
+      min-height: 100vh;
+      background: #fdf0f3;
+      background-image:
+        radial-gradient(ellipse at 15% 15%, #fce0e6 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 85%, #f5e5d8 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, #fff5f7 0%, transparent 70%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Jost', sans-serif;
+      gap: 36px;
+      padding: 50px 20px;
+    }
+
+    .bg-petals { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+    .petal {
+      position: absolute;
+      opacity: 0.06;
+      animation: floatPetal linear infinite;
+      font-size: 1.2rem;
+      color: var(--rose);
+    }
+    @keyframes floatPetal {
+      0%   { transform: translateY(110vh) rotate(0deg); opacity: 0.06; }
+      100% { transform: translateY(-10vh) rotate(40deg); opacity: 0; }
+    }
+
+    .scene {
+      position: relative;
+      z-index: 1;
+      width: min(420px, 92vw);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .envelope-wrap {
+      position: relative;
+      width: 100%;
+      perspective: 1000px;
+    }
+
+    .env-shadow {
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 28px;
+      background: radial-gradient(ellipse, var(--shadow) 0%, transparent 75%);
+      transition: opacity 0.8s;
+    }
+
+    .envelope {
+      position: relative;
+      width: 100%;
+      padding-top: 62%;
+      background: linear-gradient(170deg, #f5d8c0 0%, #f9e8d8 50%, var(--cream) 100%);
+      border-radius: 5px 5px 12px 12px;
+      box-shadow:
+        0 12px 45px var(--shadow),
+        0 2px 8px rgba(0,0,0,0.06),
+        inset 0 1px 0 rgba(255,255,255,0.6);
+    }
+
+    .env-fold-left {
+      position: absolute; bottom: 0; left: 0; width: 0; height: 0;
+      border-style: solid;
+      border-width: 0 0 180px 210px;
+      border-color: transparent transparent #e8c0a0 transparent;
+      opacity: 0.5;
+    }
+    .env-fold-right {
+      position: absolute; bottom: 0; right: 0; width: 0; height: 0;
+      border-style: solid;
+      border-width: 0 210px 180px 0;
+      border-color: transparent transparent #ddb090 transparent;
+      opacity: 0.5;
+    }
+
+    .env-flap {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      transform-origin: top center;
+      transform-style: preserve-3d;
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 10;
+    }
+    .flap-front {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      padding-top: 54%;
+      background: linear-gradient(140deg, #ddb880 0%, #c9975e 100%);
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      backface-visibility: hidden;
+      border-radius: 5px 5px 0 0;
+    }
+    .flap-back {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      padding-top: 54%;
+      background: linear-gradient(140deg, #fdf5ec 0%, #f5e8d8 100%);
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      backface-visibility: hidden;
+      transform: rotateX(180deg);
+      border-radius: 5px 5px 0 0;
+    }
+    .envelope.open .env-flap { transform: rotateX(-180deg); }
+
+    .seal {
+      position: absolute;
+      top: 38%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 20;
+      width: 56px; height: 56px;
+      background: radial-gradient(circle at 35% 32%, #e07090, var(--rose) 65%);
+      border-radius: 50%;
+      box-shadow: 0 3px 14px rgba(160,40,60,0.4), inset 0 1px 3px rgba(255,255,255,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.7rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      user-select: none;
+    }
+    .seal:hover { transform: translate(-50%,-50%) scale(1.08); box-shadow: 0 6px 20px rgba(160,40,60,0.5); }
+    .seal.broken { animation: sealPop 0.45s ease forwards; }
+    @keyframes sealPop {
+      0%   { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+      55%  { transform: translate(-50%,-50%) scale(1.3); opacity: 0.5; }
+      100% { transform: translate(-50%,-50%) scale(0); opacity: 0; pointer-events: none; }
+    }
+
+    .stamp {
+      position: absolute;
+      top: 14px; right: 16px;
+      width: 54px; height: 64px;
+      background: var(--cream);
+      border: 2px solid var(--gold);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 2px;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+      mask-image:
+        radial-gradient(circle at 0 50%, transparent 5px, black 5px),
+        radial-gradient(circle at 100% 50%, transparent 5px, black 5px),
+        radial-gradient(circle at 50% 0, transparent 5px, black 5px),
+        radial-gradient(circle at 50% 100%, transparent 5px, black 5px);
+      mask-composite: intersect;
+      -webkit-mask-image:
+        radial-gradient(circle at 0 50%, transparent 5px, black 5px),
+        radial-gradient(circle at 100% 50%, transparent 5px, black 5px),
+        radial-gradient(circle at 50% 0, transparent 5px, black 5px),
+        radial-gradient(circle at 50% 100%, transparent 5px, black 5px);
+      -webkit-mask-composite: destination-in;
+    }
+    .stamp-heart { font-size: 1.5rem; line-height: 1; }
+    .stamp-text { font-size: 0.38rem; color: var(--gold); letter-spacing: 0.1em; font-weight: 600; text-transform: uppercase; }
+
+    .address {
+      position: absolute;
+      bottom: 20%;
+      left: 12%;
+      display: flex; flex-direction: column; gap: 5px;
+      opacity: 0.2;
+    }
+    .addr-line { height: 2px; background: var(--ink); border-radius: 2px; }
+
+    .letter-wrap {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%) translateY(0);
+      width: 86%;
+      z-index: 5;
+      transition: transform 0.85s cubic-bezier(0.34, 1.35, 0.64, 1) 0.45s;
+    }
+    .envelope.open .letter-wrap {
+      transform: translateX(-50%) translateY(-240px);
+    }
+
+    .letter {
+      background: var(--cream);
+      background-image: repeating-linear-gradient(
+        transparent, transparent 29px, rgba(180,120,100,0.13) 30px
+      );
+      border-radius: 3px;
+      box-shadow: 0 6px 24px rgba(80,20,35,0.12), 0 1px 4px rgba(0,0,0,0.06);
+      padding: 22px 20px 18px;
+      min-height: 220px;
+      position: relative;
+      opacity: 0;
+      transition: opacity 0.6s ease 1s;
+      border-top: 3px solid var(--gold-light);
+    }
+    .envelope.open .letter { opacity: 1; }
+
+    .letter-greeting {
+      font-family: 'Sacramento', cursive;
+      color: var(--rose);
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .letter-body {
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--ink);
+      font-size: 1.07rem;
+      line-height: 2.1;
+      text-align: left;
+      white-space: pre-wrap;
+    }
+
+    .letter-sign {
+      margin-top: 16px;
+      font-family: 'Sacramento', cursive;
+      color: var(--rose);
+      font-size: 1.3rem;
+      text-align: right;
+    }
+
+    .btn-row {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      gap: 14px;
+    }
+
+    .btn {
+      padding: 13px 36px;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Jost', sans-serif;
+      font-size: 1rem;
+      font-weight: 400;
+      cursor: pointer;
+      letter-spacing: 0.06em;
+      transition: transform 0.2s, box-shadow 0.2s, opacity 0.4s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-open {
+      background: linear-gradient(135deg, var(--rose-light), var(--rose));
+      color: #fff;
+      box-shadow: 0 6px 22px rgba(180,50,80,0.3);
+    }
+    .btn-open:hover { box-shadow: 0 10px 28px rgba(180,50,80,0.42); }
+    .btn-open.hidden { opacity: 0; pointer-events: none; }
+
+    .btn-reset {
+      background: var(--cream);
+      color: var(--rose);
+      border: 1.5px solid var(--blush);
+      box-shadow: 0 4px 14px rgba(180,50,80,0.1);
+    }
+    .btn-reset:hover { box-shadow: 0 8px 20px rgba(180,50,80,0.18); }
+
+    .burst {
+      position: fixed;
+      pointer-events: none;
+      z-index: 999;
+      animation: burstFly 1.5s ease-out forwards;
+      font-size: 1.3rem;
+    }
+    @keyframes burstFly {
+      0%   { opacity: 1; transform: translate(0,0) scale(1) rotate(0deg); }
+      100% { opacity: 0; transform: translate(var(--dx),var(--dy)) scale(0.2) rotate(var(--dr)); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-petals" id="bgPetals"></div>
+
+  <div class="scene">
+    <div class="envelope-wrap">
+      <div class="env-shadow" id="envShadow"></div>
+
+      <div class="envelope" id="envelope">
+        <div class="env-fold-left"></div>
+        <div class="env-fold-right"></div>
+
+        <div class="stamp">
+          <div class="stamp-heart">❤️</div>
+          <div class="stamp-text">Heart Stamp</div>
+        </div>
+
+        <div class="address">
+          <div class="addr-line" style="width:75px"></div>
+          <div class="addr-line" style="width:55px"></div>
+          <div class="addr-line" style="width:65px"></div>
+        </div>
+
+        <div class="letter-wrap">
+          <div class="letter">
+            <div class="letter-greeting">For You 🤍</div>
+            <div class="letter-body" id="letterBody"></div>
+            <div class="letter-sign">With all my love ❤️</div>
+          </div>
+        </div>
+
+        <div class="env-flap" id="envFlap">
+          <div class="flap-front"></div>
+          <div class="flap-back"></div>
+        </div>
+
+        <div class="seal" id="seal">❤️</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-open" id="openBtn">Open 💌</button>
+    <button class="btn btn-reset" id="resetBtn">Reset ↩</button>
+  </div>
+
+  <script>
+    const MESSAGE =
+`I know you're not really into paper notes, so I made this for you instead 🤍
+
+I'm so, so proud of you. You work incredibly hard every single day, and I admire your dedication more than words can say. You're truly the best, and I see how much effort and heart you put into everything you do.
+
+I appreciate you so much, and I know that one day you're going to become something really great and achieve everything you dream of — you deserve it all.
+
+I love you ❤️
+
+I got you these comfy shoes because I know how much you're on your feet all day, always giving your best and taking care of others. I hope they make your days a little easier.
+
+I hope you like them, baby.`;
+
+    document.getElementById('letterBody').textContent = MESSAGE;
+
+    // floating bg petals
+    const bgEl = document.getElementById('bgPetals');
+    for (let i = 0; i < 20; i++) {
+      const p = document.createElement('span');
+      p.className = 'petal';
+      p.textContent = ['❤', '♡', '✿', '❀'][Math.floor(Math.random()*4)];
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.animationDuration = (9 + Math.random() * 14) + 's';
+      p.style.animationDelay = (-Math.random() * 14) + 's';
+      p.style.fontSize = (0.8 + Math.random() * 1.8) + 'rem';
+      bgEl.appendChild(p);
+    }
+
+    const envelope = document.getElementById('envelope');
+    const seal     = document.getElementById('seal');
+    const openBtn  = document.getElementById('openBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    let isOpen = false;
+
+    function spawnHearts() {
+      const emojis = ['❤️','💕','💖','💗','💓','🤍'];
+      for (let i = 0; i < 18; i++) {
+        const b = document.createElement('span');
+        b.className = 'burst';
+        b.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+        b.style.left = cx + 'px';
+        b.style.top  = cy + 'px';
+        const angle = Math.random() * Math.PI * 2;
+        const dist  = 90 + Math.random() * 200;
+        b.style.setProperty('--dx', Math.cos(angle)*dist + 'px');
+        b.style.setProperty('--dy', Math.sin(angle)*dist + 'px');
+        b.style.setProperty('--dr', (Math.random()*80-40) + 'deg');
+        b.style.animationDelay = (Math.random() * 0.35) + 's';
+        document.body.appendChild(b);
+        setTimeout(() => b.remove(), 2000);
+      }
+    }
+
+    function openEnvelope() {
+      if (isOpen) return;
+      isOpen = true;
+      spawnHearts();
+      seal.classList.add('broken');
+      setTimeout(() => {
+        envelope.classList.add('open');
+        document.getElementById('envShadow').style.opacity = '0.3';
+      }, 380);
+      openBtn.classList.add('hidden');
+    }
+
+    function resetEnvelope() {
+      isOpen = false;
+      envelope.classList.remove('open');
+      document.getElementById('envShadow').style.opacity = '1';
+      seal.classList.remove('broken');
+      openBtn.classList.remove('hidden');
+    }
+
+    openBtn.addEventListener('click', openEnvelope);
+    seal.addEventListener('click', openEnvelope);
+    resetBtn.addEventListener('click', resetEnvelope);
+  </script>
+</body>
+</html>
